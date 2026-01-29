@@ -22,4 +22,10 @@ function Game:draw()
     self.MC:draw()
 end
 
+function Game:keypressed(key)
+    if key == 'x' then
+        self.MC:swordAttack()
+    end
+end
+
 return Game

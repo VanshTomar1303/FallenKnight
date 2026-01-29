@@ -32,7 +32,11 @@ function Player:load(x, y)
         runDown = anim8.newGrid(96, 80, playerSpriteSheets.runDown:getWidth(), playerSpriteSheets.runDown:getHeight()),
         runUp = anim8.newGrid(96, 80, playerSpriteSheets.runUp:getWidth(), playerSpriteSheets.runUp:getHeight()),
         runLeft = anim8.newGrid(96, 80, playerSpriteSheets.runLeft:getWidth(), playerSpriteSheets.runLeft:getHeight()),
-        runRight = anim8.newGrid(96, 80, playerSpriteSheets.runRight:getWidth(), playerSpriteSheets.runRight:getHeight())
+        runRight = anim8.newGrid(96, 80, playerSpriteSheets.runRight:getWidth(), playerSpriteSheets.runRight:getHeight()),
+        attackRight = anim8.newGrid(96, 80, playerSpriteSheets.attack1Right:getWidth(), playerSpriteSheets.attack1Right:getHeight()),
+        attackUp = anim8.newGrid(96, 80, playerSpriteSheets.attack1Up:getWidth(), playerSpriteSheets.attack1Up:getHeight()),
+        attackDown = anim8.newGrid(96, 80, playerSpriteSheets.attack1Down:getWidth(), playerSpriteSheets.attack1Down:getHeight()),
+        attackLeft = anim8.newGrid(96, 80, playerSpriteSheets.attack1Left:getWidth(), playerSpriteSheets.attack1Left:getHeight()),
     }
 
 
@@ -55,6 +59,9 @@ function Player:load(x, y)
     self.isMoving = false
     self.isAttacking = false
 
+    -- MC attacking cooldown
+    self.attackCooldown = 0.5
+
     -- MC Spritesheets
     self.playerSpriteSheets = playerSpriteSheets
 
@@ -70,7 +77,11 @@ function Player:load(x, y)
         runDown = anim8.newAnimation(playerGrids.runDown('1-8', 1), 0.2),
         runUp = anim8.newAnimation(playerGrids.runUp('1-8', 1), 0.2),
         runLeft = anim8.newAnimation(playerGrids.runLeft('1-8', 1), 0.2),
-        runRight = anim8.newAnimation(playerGrids.runRight('1-8', 1), 0.2)
+        runRight = anim8.newAnimation(playerGrids.runRight('1-8', 1), 0.2),
+        attackDown = anim8.newAnimation(playerGrids.attackDown('1-8',1), 0.1),
+        attackUp = anim8.newAnimation(playerGrids.attackUp('1-8',1), 0.1),
+        attackLeft = anim8.newAnimation(playerGrids.attackLeft('1-8',1), 0.1),
+        attackRight = anim8.newAnimation(playerGrids.attackRight('1-8',1), 0.1),
     }
 
     -- MC current spritesheet
@@ -90,6 +101,14 @@ function Player:update(dt)
     self:movement(dt)
     self:changeAnimationAndSpritesheet()
 
+    -- handling sword attack and cooldown
+    if self.isAttacking then
+        self.attackCooldown = self.attackCooldown - dt
+        if self.attackCooldown <= 0 then
+            self.isAttacking = false
+            self.attackCooldown = 0
+        end
+    end
 
     -- updating the animaton
     self.currentAnimation:update(dt)
@@ -130,7 +149,7 @@ function Player:changeAnimationAndSpritesheet()
             self.currentPlayerSpriteSheet = self.playerSpriteSheets.runRight
             self.currentAnimation = self.animation.runRight
         end
-    elseif not self.isMoving then
+    elseif not self.isMoving and not self.isAttacking then
         if self.dir == 'down' then
             self.currentPlayerSpriteSheet = self.playerSpriteSheets.idleDown
             self.currentAnimation = self.animation.idleDown
@@ -147,6 +166,30 @@ function Player:changeAnimationAndSpritesheet()
     end
 end
 
+function Player:swordAttack()
+    self.isAttacking = true
+    self.attackCooldown = 0.8
+    self:attackingAnimation()
+end
+
+function Player:attackingAnimation()
+    if self.isAttacking then
+        if self.dir == 'down' then
+            self.currentPlayerSpriteSheet = self.playerSpriteSheets.attack1Down
+            self.currentAnimation = self.animation.attackDown
+        elseif self.dir == 'up' then
+            self.currentPlayerSpriteSheet = self.playerSpriteSheets.attack1Up
+            self.currentAnimation = self.animation.attackUp
+        elseif self.dir == 'left' then
+            self.currentPlayerSpriteSheet = self.playerSpriteSheets.attack1Left
+            self.currentAnimation = self.animation.attackLeft
+        elseif self.dir == 'right' then
+            self.currentPlayerSpriteSheet = self.playerSpriteSheets.attack1Right
+            self.currentAnimation = self.animation.attackRight
+        end
+    end
+end
+
 function Player:draw()
     -- health bar
     healthBar(self.maxHealth, self.currentHealth)
@@ -157,9 +200,9 @@ end
 
 function healthBar(maxHealth, currentHealth)
     love.graphics.setColor(1,1,1)
-    love.graphics.rectangle('line', 10, 20, maxHealth * 2, 25)
+    love.graphics.rectangle('line', 10, 20, maxHealth * 2, 15)
     love.graphics.setColor(1,0,0)
-    love.graphics.rectangle('fill', 10, 20, currentHealth * 2, 25)
+    love.graphics.rectangle('fill', 10, 20, currentHealth * 2, 15)
     love.graphics.setColor(1,1,1)
 end
 
