@@ -4,7 +4,15 @@ local MC = require 'src.player'
 Game = {}
 Game.__index = Game
 
+local game_state = {
+    menu = "Menu",
+    pause = "Pause",
+    game_over = "DIE",
+    running = "Running"
+}
+
 function Game:load()
+    self.game_state = game_state.menu
     self.MC = MC:load()
     self.Map = Map:load()
 
@@ -13,16 +21,39 @@ function Game:load()
 end
 
 function Game:update(dt)
-    self.MC:update(dt)
-    self.Map:update(dt)
+    if self.game_state == game_state.running then
+        self.MC:update(dt)
+        self.Map:update(dt)
+    end
 end
 
+
+
 function Game:draw()
-    self.Map:draw()
-    self.MC:draw()
+    if self.game_state == game_state.menu then
+        love.graphics.print("Menu", 100, 100)
+    elseif self.game_state == game_state.running then
+        self.Map:draw()
+        self.MC:draw()
+    elseif self.game_state == game_state.game_over then
+        love.graphics.print("DIE", 100, 100)
+    elseif self.game_state == game_state.pause then
+        love.graphics.print("Pause", 100, 100)
+    end
 end
 
 function Game:keypressed(key)
+
+    -- game state
+    if key == 'p' then
+        self.game_state = "Pause"
+        print("hello")
+    end
+    if key == 'return' or self.game_state == 'Menu' and self. game_state == 'Pause' then 
+        self.game_state = "Running"
+    end
+
+    -- Player sword attack
     if key == 'x' then
         self.MC:swordAttack()
     end
