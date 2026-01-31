@@ -48,6 +48,9 @@ function Orc1:load(x, y)
 
     -- orc1 direction
     self.dir = 'down'
+
+    -- orc1 attack range
+    self.attack_range = 250
     
     -- orc1 animations
     self.animation = {
@@ -55,6 +58,18 @@ function Orc1:load(x, y)
         idleUp = anim8.newAnimation(orc1Grids.orcIdle('1-4', 2), 0.2),
         idleLeft = anim8.newAnimation(orc1Grids.orcIdle('1-4', 3), 0.2),
         idleRight = anim8.newAnimation(orc1Grids.orcIdle('1-4', 4), 0.2),
+        walkDown = anim8.newAnimation(orc1Grids.orcWalk('1-6', 1), 0.2),
+        walkUp = anim8.newAnimation(orc1Grids.orcWalk('1-6', 2), 0.2),
+        walkLeft = anim8.newAnimation(orc1Grids.orcWalk('1-6', 3), 0.2),
+        walkRight = anim8.newAnimation(orc1Grids.orcWalk('1-6', 4), 0.2),
+        attackDown = anim8.newAnimation(orc1Grids.orcAttack('1-6', 1), 0.1),
+        attackUp = anim8.newAnimation(orc1Grids.orcAttack('1-6', 2), 0.1),
+        attackLeft = anim8.newAnimation(orc1Grids.orcAttack('1-6', 3), 0.1),
+        attackRight = anim8.newAnimation(orc1Grids.orcAttack('1-6', 4), 0.1),
+        deathDown = anim8.newAnimation(orc1Grids.orcDeath('1-8', 1), 0.2),
+        deathUp = anim8.newAnimation(orc1Grids.orcDeath('1-8', 2), 0.2),
+        deathLeft = anim8.newAnimation(orc1Grids.orcDeath('1-8', 3), 0.2),
+        deathRight = anim8.newAnimation(orc1Grids.orcDeath('1-8', 4), 0.2),
     }
 
     -- orc1 current spritesheet
@@ -165,17 +180,31 @@ end
 
 function Orc1:draw()
     -- health bar
-    orcHealthBar(self.maxHealth, self.currentHealth)
+    self:orcHealthBar(self.maxHealth, self.currentHealth)
+
+    --orc range
+    self:attackRange(self.attack_range, self.x, self.y)
 
     -- orc1
     self.currentAnimation:draw(self.currentOrcSpriteSheet, self.x, self.y, 0 , self.scale)
 end
 
-function orcHealthBar(maxHealth, currentHealth)
+function Orc1:attackRange(range , x, y)
+    local offsetX, offsetY = 60, 60
+    -- love.graphics.setColor(1,1,1)
+    love.graphics.setColor(1,0,0)
+    love.graphics.circle('line', x + offsetX, y + offsetY, range)
     love.graphics.setColor(1,1,1)
-    love.graphics.rectangle('line', 500, 20, maxHealth * 2, 15)
+end
+
+function Orc1:orcHealthBar(maxHealth, currentHealth)
+    local heathBarOffsetX = 40
+    local scaleHealthBar = 2
+    local height = 15
+    love.graphics.setColor(1,1,1)
+    love.graphics.rectangle('line', self.x - heathBarOffsetX, self.y, maxHealth * scaleHealthBar, height)
     love.graphics.setColor(0.6,0.4,0)
-    love.graphics.rectangle('fill', 500, 20, currentHealth * 2, 15)
+    love.graphics.rectangle('fill', self.x - heathBarOffsetX, self.y, currentHealth * scaleHealthBar, height)
     love.graphics.setColor(1,1,1)
 end
 

@@ -199,10 +199,14 @@ function Player:draw()
 end
 
 function healthBar(maxHealth, currentHealth)
+    local height = 15
+    local scaleHealthBar = 2
+    local x, y = 10, 20
+
     love.graphics.setColor(1,1,1)
-    love.graphics.rectangle('line', 10, 20, maxHealth * 2, 15)
+    love.graphics.rectangle('line', x, y, maxHealth * scaleHealthBar, height)
     love.graphics.setColor(1,0,0)
-    love.graphics.rectangle('fill', 10, 20, currentHealth * 2, 15)
+    love.graphics.rectangle('fill', x, y, currentHealth * scaleHealthBar, height)
     love.graphics.setColor(1,1,1)
 end
 
