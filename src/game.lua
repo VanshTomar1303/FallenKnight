@@ -12,9 +12,15 @@ local game_state = {
     running = "Running"
 }
 
-function Game:load()
+function Game:load(world)
     self.game_state = game_state.menu
-    self.MC = MC:load()
+
+    self.world = world
+
+    self.playerX = 100
+    self.playerY = 200
+
+    self.MC = MC:load(playerX, playerY,world)
     self.Orc1 = Orc1:load(500,100)
     self.Map = Map:load()
 
@@ -27,6 +33,7 @@ function Game:update(dt)
         self.MC:update(dt)
         self.Orc1:update(dt)
         self.Map:update(dt)
+        self.world:update(dt)
     end
 end
 
@@ -37,6 +44,7 @@ function Game:draw()
         self.Map:draw()
         self.MC:draw()
         self.Orc1:draw()
+        self.world:draw()
     elseif self.game_state == game_state.game_over then
         love.graphics.print("DIE", 100, 100)
     elseif self.game_state == game_state.pause then

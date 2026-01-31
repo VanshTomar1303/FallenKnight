@@ -3,7 +3,7 @@ local anim8 = require 'libs.anim8'
 Player = {}
 Player.__index = Player
 
-function Player:load(x, y)
+function Player:load(x, y, world)
 
     self.scale = 2
 
@@ -90,6 +90,14 @@ function Player:load(x, y)
     -- MC current animation
     self.currentAnimation = self.animation.idleDown
 
+    -- hurtbox
+    local height, width, rounded = 40,30,10
+    local hurtboxOffsetX, hurtboxOffsetY = 80,65
+    self.hurtbox = world:newBSGRectangleCollider(self.x + hurtboxOffsetX, self.y + hurtboxOffsetY, width, height, rounded)
+    self.hurtbox:setFixedRotation(true)
+    self.hurtbox:setCollisionClass('PlayerHurtBox')
+    self.hurtbox:setObject(this)
+
     setmetatable(self, Player)
     return self
 end
@@ -100,6 +108,10 @@ function Player:update(dt)
     -- movement and changing animation/spritesheet
     self:movement(dt)
     self:changeAnimationAndSpritesheet()
+
+    if not self.isMoving and not self.isAttacking then
+        self.hurtbox:setLinearVelocity(0, 0)
+    end
 
     -- handling sword attack and cooldown
     if self.isAttacking then
@@ -115,23 +127,25 @@ function Player:update(dt)
 end
 
 function Player:movement(dt)
+    local vx, vy = 0,0
     if love.keyboard.isDown('w') then
-        self.y = self.y - self.speed * dt
+        vy =  - self.speed
         self.dir = 'up'
         self.isMoving = true
     elseif love.keyboard.isDown('s') then
-        self.y = self.y + self.speed * dt
+        vy = self.speed
         self.dir = 'down'
         self.isMoving = true
     elseif love.keyboard.isDown('a') then
-        self.x = self.x - self.speed * dt
+        vx = - self.speed
         self.dir = 'left'
         self.isMoving = true
     elseif love.keyboard.isDown('d') then
-        self.x = self.x +  self.speed * dt
+        vx =  self.speed
         self.dir = 'right'
         self.isMoving = true
     end
+    self.hurtbox:setLinearVelocity(vx, vy)
 end
 
 function Player:changeAnimationAndSpritesheet()
@@ -191,11 +205,15 @@ function Player:attackingAnimation()
 end
 
 function Player:draw()
+
+    local playerX, playerY = self.hurtbox:getPosition()
+    local offsetX, offsetY = 48, 48
+
     -- health bar
     healthBar(self.maxHealth, self.currentHealth)
 
     -- MC
-    self.currentAnimation:draw(self.currentPlayerSpriteSheet, self.x, self.y, 0 , self.scale)
+    self.currentAnimation:draw(self.currentPlayerSpriteSheet, playerX, playerY, 0 , self.scale , nil, offsetX, offsetY)
 end
 
 function healthBar(maxHealth, currentHealth)

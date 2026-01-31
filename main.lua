@@ -1,9 +1,15 @@
 local love = require("love")
 local Game = require("src.game")
+local windfield = require 'libs.windfield'
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
-	game = Game:load()
+
+	local world = windfield.newWorld(0, 0)
+    world:addCollisionClass('PlayerHurtBox')
+    world:addCollisionClass('OrcHurtBox')
+
+	game = Game:load(world)
 end
 
 function love.update(dt)
