@@ -1,5 +1,6 @@
 local Map = require 'src.map'
 local MC = require 'src.player'
+local Orc1 = require 'src.enemy.Orc1'
 
 Game = {}
 Game.__index = Game
@@ -14,6 +15,7 @@ local game_state = {
 function Game:load()
     self.game_state = game_state.menu
     self.MC = MC:load()
+    self.Orc1 = Orc1:load(500,100)
     self.Map = Map:load()
 
     setmetatable(self, Game)
@@ -23,11 +25,10 @@ end
 function Game:update(dt)
     if self.game_state == game_state.running then
         self.MC:update(dt)
+        self.Orc1:update(dt)
         self.Map:update(dt)
     end
 end
-
-
 
 function Game:draw()
     if self.game_state == game_state.menu then
@@ -35,6 +36,7 @@ function Game:draw()
     elseif self.game_state == game_state.running then
         self.Map:draw()
         self.MC:draw()
+        self.Orc1:draw()
     elseif self.game_state == game_state.game_over then
         love.graphics.print("DIE", 100, 100)
     elseif self.game_state == game_state.pause then

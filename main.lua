@@ -16,4 +16,8 @@ end
 
 function love.keypressed(key)
     game:keypressed(key)
+
+	if key == '0' then
+		love.event.quit()
+	end 
 end
